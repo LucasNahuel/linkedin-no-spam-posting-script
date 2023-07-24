@@ -68,6 +68,15 @@
 
 
         parentButton.appendChild(dialog);
+
+
+        document.body.addEventListener('click', (e) => {
+            if(!e.target.classList.contains("artdeco-dropdown__item") && !e.target.classList.contains("artdeco-hoverable-content__shell")){
+                dialog.remove();
+            }
+        }
+        )
+
     }
 
 
@@ -88,7 +97,8 @@
                 let newButton = threeDottedButton.cloneNode(true);
 
                 newButton.style.cssText += 'position:absolute;right:0;bottom:0;overflow:visible;'
-                newButton.addEventListener('click',()=>{
+                newButton.addEventListener('click', (e)=>{
+                    e.stopPropagation();
                     openBlockDialog(newButton);
                 });
 
