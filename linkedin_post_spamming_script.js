@@ -20,6 +20,9 @@
     //contains the blocked posters
     let blockedSources = [];
 
+
+    let visitedAnnounces = [];
+
     if(localStorage.getItem("blockedSources") != null){
 
         blockedSources = JSON.parse(localStorage.getItem("blockedSources"));
@@ -28,7 +31,7 @@
 
     let threeDottedButton = null;
 
-
+    //copy element for the button
     async function searchButton(){
         while(threeDottedButton == null){
             await sleep(300);
@@ -37,6 +40,115 @@
     }
 
     await searchButton();
+
+
+
+    //serch for the "all filters" button
+
+
+    async function searchFiltersButton(){
+
+        let filterButton = null;
+
+        while(filterButton == null || filterButton.length == 0){
+
+            await sleep(300);
+            filterButton = document.getElementsByClassName("artdeco-pill artdeco-pill--slate artdeco-pill--choice artdeco-pill--2 search-reusables__filter-pill-button\n     search-reusables__filter-pill-button search-reusables__all-filters-pill-button"
+);
+
+        }
+
+        filterButton = filterButton[0];
+
+        filterButton.addEventListener('click', ()=>{
+            searchFiltersList();
+        });
+
+
+    }
+
+    searchFiltersButton();
+
+    async function searchFiltersList(){
+
+        let filtersList = null;
+
+        while(filtersList == null){
+            await sleep(300);
+            filtersList = document.getElementsByClassName("search-reusables__secondary-filters-filter");
+        }
+
+        let blockingSourcesFilter = document.createElement('li');
+        let fieldSet = document.createElement('fieldset');
+        let blockingSourcesTitle = document.createElement('h3');
+        blockingSourcesTitle.innerText = "Blocked announcers";
+        blockingSourcesTitle.className = "t-16 t-black t-bold inline-block";
+        fieldSet.appendChild(blockingSourcesTitle);
+
+        let pillContainer = document.createElement('div');
+        pillContainer.style.cssText += "width:100%;gap:1em;display:flex;flex-wrap:wrap;margin-top:24px;";
+        pillContainer.className = "t-14 t-black--light t-normal";
+
+        if(blockedSources.length == 0){
+
+            pillContainer.innerText = "You haven't block any announcer yet";
+
+        }
+
+        for(let i=0; i<blockedSources.length; i++){
+
+            let pill = document.createElement('button');
+            pill.className = "artdeco-dropdown__trigger artdeco-dropdown__trigger--placement-bottom ember-view artdeco-pill artdeco-pill--slate artdeco-pill--choice artdeco-pill--2 search-reusables__filter-pill-button artdeco-pill--selected cursor-pointer";
+            pill.innerText = blockedSources[i];
+
+            let closeIcon = document.getElementsByClassName("mercado-match")[0].cloneNode(true);
+            closeIcon.style.cssText += "margin-left:4px;width:16px;height:16px";
+
+            pill.appendChild(closeIcon);
+
+            pill.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                unblockAnnouncer(pill.innerText);
+                 if(blockedSources.length == 0){
+
+                     pillContainer.innerText = "You haven't block any announcer yet";
+
+                 }
+                pill.remove();
+            });
+
+            pillContainer.appendChild(pill);
+        }
+
+        fieldSet.appendChild(pillContainer);
+        let divider = document.createElement('hr');
+        divider.className = "reusable-search-filters-advanced-filters__divider";
+        fieldSet.appendChild(divider);
+
+        blockingSourcesFilter.appendChild(fieldSet);
+
+
+        filtersList[0].parentElement.insertBefore(blockingSourcesFilter, filtersList[0]);
+    }
+
+
+    function unblockAnnouncer(announcer){
+
+        blockedSources = blockedSources.filter(element => element !== announcer);
+        localStorage.setItem("blockedSources", JSON.stringify(blockedSources));
+            let visitedAnnounces = [];
+        console.log(blockedSources);
+    }
+
+
+
+
+
+
+
+
+
+
 
     function openBlockDialog(parentButton){
 
@@ -57,7 +169,7 @@
             let successNotification = document.createElement('div');
             successNotification.innerText = "You will no longer see announces from "+publisher;
             successNotification.style.cssText += "color:var(--color-signal-positive);text-align:center;";
-            parentButton.parentElement.replaceChildren(successNotification);
+            //parentButton.parentElement.replaceChildren(successNotification);
         })
 
         let icon = document.getElementsByClassName("job-card-container__action artdeco-button artdeco-button--circle artdeco-button--muted artdeco-button--2 artdeco-button--tertiary ember-view")[0].children[0];
@@ -80,7 +192,6 @@
     }
 
 
-    let visitedAnnounces = [];
 
     while(true){
 
@@ -104,6 +215,7 @@
 
                 jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.appendChild(newButton);
                 visitedAnnounces.push(jobAnnounces[i]);
+                jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.style.cssText += 'display:block !important';
             }
 
             // let newButton = threeDottedButton.cloneNode(true);
