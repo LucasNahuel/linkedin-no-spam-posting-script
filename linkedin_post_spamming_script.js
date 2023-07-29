@@ -23,6 +23,9 @@
 
     let visitedAnnounces = [];
 
+
+    let blockedPosts = [];
+
     if(localStorage.getItem("blockedSources") != null){
 
         blockedSources = JSON.parse(localStorage.getItem("blockedSources"));
@@ -136,12 +139,22 @@
 
         blockedSources = blockedSources.filter(element => element !== announcer);
         localStorage.setItem("blockedSources", JSON.stringify(blockedSources));
-            let visitedAnnounces = [];
+        revealHiddenPosts(announcer);
         console.log(blockedSources);
     }
 
 
+    function revealHiddenPosts(announcer){
 
+        for(let i = 0; i< blockedPosts.length; i++){
+
+            if(blockedPosts[i].children[0].children[1].children[1].children[0].innerText.trim() == announcer){
+                blockedPosts[i].style.cssText = 'display:block';
+            }
+        }
+
+
+    }
 
 
 
@@ -168,8 +181,9 @@
             localStorage.setItem("blockedSources", JSON.stringify(blockedSources));
             let successNotification = document.createElement('div');
             successNotification.innerText = "You will no longer see announces from "+publisher;
-            successNotification.style.cssText += "color:var(--color-signal-positive);text-align:center;";
-            //parentButton.parentElement.replaceChildren(successNotification);
+            successNotification.style.cssText += "color:var(--color-signal-positive);text-align:center;height:155px;display:flex;flex-direction:column;flex-align:center;justify-content:center;";
+            parentButton.parentElement.parentElement.insertBefore(successNotification, parentButton.parentElement);
+            sleep(3000).then(()=>{successNotification.remove()});
         })
 
         let icon = document.getElementsByClassName("job-card-container__action artdeco-button artdeco-button--circle artdeco-button--muted artdeco-button--2 artdeco-button--tertiary ember-view")[0].children[0];
@@ -215,7 +229,6 @@
 
                 jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.appendChild(newButton);
                 visitedAnnounces.push(jobAnnounces[i]);
-                jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.style.cssText += 'display:block !important';
             }
 
             // let newButton = threeDottedButton.cloneNode(true);
@@ -225,8 +238,8 @@
             // jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.appendChild(newButton);
 
         if(blockedSources.includes(jobAnnounces[i].innerText) ){
-                jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.style.cssText += 'display:none !important';
-               console.log(jobAnnounces[i].parentElement.parentElement.parentElement.parentElement);
+                jobAnnounces[i].parentElement.parentElement.parentElement.parentElement.style.cssText = 'display:none';
+               blockedPosts.push(jobAnnounces[i].parentElement.parentElement.parentElement.parentElement);
             }
 
         }
